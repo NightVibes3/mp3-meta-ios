@@ -1,0 +1,22 @@
+# Credentials and secrets
+*.token
+*.key
+.env
+.env.local
+.github_token
+clawdbot.json
+clawdbot.json.bak*
+.npmrc
+
+# Clawdbot state
+.clawdbot/
+
+# Node
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
