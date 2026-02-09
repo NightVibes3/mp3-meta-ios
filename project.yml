@@ -5,9 +5,11 @@ targets:
     platform: iOS
     deploymentTarget: "16.0"
     sources:
-      - Sources
+      - path: Sources
+        excludes:
+          - Info.plist
     resources:
-      - Sources/www
+      - path: Sources/www
     settings:
       INFOPLIST_FILE: $(SRCROOT)/Sources/Info.plist
       PRODUCT_BUNDLE_IDENTIFIER: com.nightvibes3.mp3meta
