@@ -28,19 +28,22 @@ struct WebView: UIViewRepresentable {
         context.coordinator.refreshControl = refreshControl
         context.coordinator.webView = webView
         
-        // Load bundled web content
-        guard let wwwPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "www") else {
-            print("ERROR: Could not find index.html in www directory")
+        // Load bundled web content - files are in app bundle root (not www subfolder)
+        guard let indexURL = Bundle.main.url(forResource: "index", withExtension: "html") else {
+            print("ERROR: Could not find index.html in bundle")
+            // List what's in the bundle for debugging
+            if let resources = try? FileManager.default.contentsOfDirectory(at: Bundle.main.bundleURL, includingPropertiesForKeys: nil) {
+                print("Bundle contents: \(resources.map { $0.lastPathComponent })")
+            }
             return webView
         }
         
-        let indexURL = URL(fileURLWithPath: wwwPath)
-        let wwwURL = indexURL.deletingLastPathComponent()
+        let bundleURL = Bundle.main.bundleURL
         
         print("Loading from: \(indexURL)")
-        print("Access root: \(wwwURL)")
+        print("Bundle URL: \(bundleURL)")
         
-        webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
+        webView.loadFileURL(indexURL, allowingReadAccessTo: bundleURL)
         
         return webView
     }
