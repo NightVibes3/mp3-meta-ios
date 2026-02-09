@@ -8,10 +8,8 @@ targets:
       - path: Sources
         excludes:
           - Info.plist
-          - Assets.xcassets
     resources:
       - path: Sources/www
-      - path: Sources/Assets.xcassets
     settings:
       INFOPLIST_FILE: $(SRCROOT)/Sources/Info.plist
       PRODUCT_BUNDLE_IDENTIFIER: com.nightvibes3.mp3meta

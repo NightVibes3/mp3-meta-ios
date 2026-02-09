@@ -28,11 +28,19 @@ struct WebView: UIViewRepresentable {
         context.coordinator.refreshControl = refreshControl
         context.coordinator.webView = webView
         
-        // Load bundled web content - allow access to entire www folder for assets
-        if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") {
-            let wwwURL = indexURL.deletingLastPathComponent().deletingLastPathComponent()
-            webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
+        // Load bundled web content
+        guard let wwwPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "www") else {
+            print("ERROR: Could not find index.html in www directory")
+            return webView
         }
+        
+        let indexURL = URL(fileURLWithPath: wwwPath)
+        let wwwURL = indexURL.deletingLastPathComponent()
+        
+        print("Loading from: \(indexURL)")
+        print("Access root: \(wwwURL)")
+        
+        webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
         
         return webView
     }
@@ -52,11 +60,17 @@ struct WebView: UIViewRepresentable {
         }
         
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            print("WebView loaded successfully")
             refreshControl?.endRefreshing()
         }
         
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print("WebView failed: \(error)")
             refreshControl?.endRefreshing()
+        }
+        
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            print("WebView provisional load failed: \(error)")
         }
     }
 }
