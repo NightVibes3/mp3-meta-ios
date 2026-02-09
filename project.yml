@@ -1,0 +1,19 @@
+name: MP3Meta
+targets:
+  MP3Meta:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Sources
+    resources:
+      - Sources/www
+    settings:
+      INFOPLIST_FILE: $(SRCROOT)/Sources/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.nightvibes3.mp3meta
+      PRODUCT_NAME: MP3Meta
+      SWIFT_VERSION: "5.9"
+      TARGETED_DEVICE_FAMILY: "1"
+      CODE_SIGN_STYLE: Manual
+      DEVELOPMENT_TEAM: ""
+      CODE_SIGN_IDENTITY: ""

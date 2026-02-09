@@ -40,9 +40,17 @@ jobs:
 
       - name: Create Payload and IPA
         run: |
+          echo "=== Archive contents ==="
+          ls -la build/MP3Meta.xcarchive/ || echo "No xcarchive"
+          ls -la build/MP3Meta.xcarchive/Products/ 2>/dev/null || echo "No Products"
           mkdir -p build/Payload
           # Find and copy app bundle
           APP_PATH=$(find build/MP3Meta.xcarchive -name "*.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: No .app found in archive"
+            exit 1
+          fi
           cp -R "$APP_PATH" build/Payload/
           cd build
           zip -r MP3Meta-unsigned.ipa Payload
