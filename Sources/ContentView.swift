@@ -29,8 +29,8 @@ struct WebView: UIViewRepresentable {
         context.coordinator.webView = webView
         
         // Load bundled web content - allow access to entire www folder for assets
-        if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www"),
-           let wwwURL = indexURL.deletingLastPathComponent().deletingLastPathComponent() {
+        if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") {
+            let wwwURL = indexURL.deletingLastPathComponent().deletingLastPathComponent()
             webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
         }
         
