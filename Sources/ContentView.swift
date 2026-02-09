@@ -17,14 +17,20 @@ struct WebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         
-        // Disable pull-to-refresh and bounce effects
-        webView.scrollView.bounces = false
-        webView.scrollView.alwaysBounceVertical = false
-        webView.scrollView.alwaysBounceHorizontal = false
+        // Enable bounce for pull-to-refresh
+        webView.scrollView.bounces = true
+        webView.scrollView.alwaysBounceVertical = true
+        
+        // Add pull-to-refresh
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(context.coordinator, action: #selector(Coordinator.handlePullToRefresh), for: .valueChanged)
+        webView.scrollView.refreshControl = refreshControl
+        context.coordinator.refreshControl = refreshControl
+        context.coordinator.webView = webView
         
         // Load bundled web content
         if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") {
-            webView.loadFileURL(indexURL, allowingReadAccessTo: indexURL)
+            webView.loadFileURL(indexURL, allowingReadAccessTo: indexURL.deletingLastPathComponent())
         }
         
         return webView
@@ -37,16 +43,19 @@ struct WebView: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, WKNavigationDelegate {
+        var refreshControl: UIRefreshControl?
+        weak var webView: WKWebView?
+        
+        @objc func handlePullToRefresh() {
+            webView?.reload()
+        }
+        
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            // Prevent overscroll behavior
-            let script = """
-                document.documentElement.style.overscrollBehavior = 'none';
-                document.body.style.overscrollBehavior = 'none';
-                if (window.navigator.standalone) {
-                    document.body.classList.add('standalone-mode');
-                }
-            """
-            webView.evaluateJavaScript(script)
+            refreshControl?.endRefreshing()
+        }
+        
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            refreshControl?.endRefreshing()
         }
     }
 }
