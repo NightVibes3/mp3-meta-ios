@@ -25,6 +25,7 @@ jobs:
 
       - name: Build unsigned IPA
         run: |
+          set -o pipefail
           mkdir -p build
           # Build archive without signing
           xcodebuild archive \
@@ -37,6 +38,13 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM="" \
             | tee build-log.txt
+          echo "Build exit code: ${PIPESTATUS[0]}"
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build-log.txt
 
       - name: Create Payload and IPA
         run: |
