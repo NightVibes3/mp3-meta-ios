@@ -8,6 +8,8 @@ targets:
       - path: Sources
         excludes:
           - Info.plist
+      - path: Sources/Assets.xcassets
+        type: folder
     resources:
       - path: Sources/www
     settings:
