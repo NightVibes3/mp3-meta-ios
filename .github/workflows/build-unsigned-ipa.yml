@@ -23,39 +23,41 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: Build unsigned IPA
+      - name: Build unsigned app
         run: |
           set -o pipefail
           mkdir -p build
-          # Build archive without signing
-          xcodebuild archive \
+          # Build the app (not archive) to avoid codesign issues
+          xcodebuild build \
             -project MP3Meta.xcodeproj \
             -scheme MP3Meta \
-            -archivePath build/MP3Meta.xcarchive \
             -destination 'generic/platform=iOS' \
+            -configuration Release \
+            -derivedDataPath build/DerivedData \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM="" \
+            SKIP_INSTALL=NO \
             | tee build-log.txt
           echo "Build exit code: ${PIPESTATUS[0]}"
-      - name: Upload build log
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build-log.txt
 
-      - name: Create Payload and IPA
+      - name: Find and copy app bundle
         run: |
-          mkdir -p build/Payload
-          # Find and copy app bundle
-          APP_PATH=$(find build/MP3Meta.xcarchive -name "*.app" -type d | head -1)
+          # Find the built .app in DerivedData
+          APP_PATH=$(find build/DerivedData -name "*.app" -type d | head -1)
           if [ -z "$APP_PATH" ]; then
-            echo "ERROR: No .app found in archive"
+            echo "ERROR: No .app found in DerivedData"
+            ls -la build/DerivedData/
             exit 1
           fi
+          echo "Found app at: $APP_PATH"
+          
+          # Create Payload directory
+          mkdir -p build/Payload
           cp -R "$APP_PATH" build/Payload/
+          
+          # Create IPA
           cd build
           zip -r MP3Meta-unsigned.ipa Payload
 
